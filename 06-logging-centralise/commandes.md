@@ -91,3 +91,30 @@ Teste la configuration en mode simulation, sans rien modifier réellement, avant
 sudo logrotate -f /etc/logrotate.d/remote-ubuntu-dc
 ```
 Force une rotation réelle pour valider que la configuration fonctionne correctement une fois le test en simulation concluant.
+
+## Durcissement du pare-feu (UFW)
+
+```bash
+sudo ufw allow 22/tcp
+```
+Autorise SSH en priorité, avant toute activation du pare-feu, pour ne pas couper l'accès distant à la VM.
+
+```bash
+sudo ufw allow from 192.168.10.0/24 to any port 514 proto udp
+```
+Restreint la réception des logs au seul réseau interne du labo, plutôt que d'ouvrir le port 514/UDP à toute source.
+
+```bash
+sudo ufw show added
+```
+Liste les règles enregistrées avant activation (ufw status n'affiche rien tant que le pare-feu est inactif).
+
+```bash
+sudo ufw enable
+```
+Active le pare-feu avec la politique par défaut (deny en entrée, allow en sortie).
+
+```bash
+sudo ufw status verbose
+```
+Vérifie l'état et le détail des règles actives, puis revalidation de la connexion SSH et de la réception des logs pour confirmer qu'aucun flux légitime n'a été cassé.
