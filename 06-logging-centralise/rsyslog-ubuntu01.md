@@ -1,27 +1,27 @@
-# Logging centralise avec rsyslog (Ubuntu-01)
+# Logging centralisé avec rsyslog (Ubuntu-01)
 
-## Contexte / objectif
+## Contexte et objectif
 
-Ubuntu-01 (192.168.10.20) n'avait jusque-la aucun role actif dans le labo CYBER-LAB. Decision de lui donner la fonction de serveur de logs centralise, recevant d'abord les logs d'Ubuntu-DC, avec pour objectif a terme de s'entrainer a la recherche et au filtrage de logs dans une logique proche d'un poste SOC.
+Ubuntu-01 (192.168.10.20) n'avait jusque-là aucun rôle actif dans le labo CYBER-LAB. Décision de lui donner la fonction de serveur de logs centralisé, recevant d'abord les logs d'Ubuntu-DC, avec pour objectif à terme de s'entraîner à la recherche et au filtrage de logs dans une logique proche d'un poste SOC.
 
 ## Choix techniques
 
-Le protocole UDP est choisi pour la reception des logs, juge suffisant pour un labo (par opposition a TCP, plus fiable mais plus complexe a mettre en oeuvre pour ce cas d'usage). Le module imudp de rsyslog est active, avec ecoute sur le port 514, et l'ecoute est verifiee fonctionnelle avec la commande ss -lunp.
+Le protocole UDP est choisi pour la réception des logs, jugé suffisant pour un labo (par opposition à TCP, plus fiable mais plus complexe à mettre en œuvre pour ce cas d'usage). Le module imudp de rsyslog est activé, avec écoute sur le port 514, et l'écoute est vérifiée fonctionnelle avec la commande ss -lunp.
 
-## Mise en place cote reception (Ubuntu-01)
+## Mise en place côté réception (Ubuntu-01)
 
-Une regle rsyslog dediee est ajoutee dans /etc/rsyslog.d/10-remote-ubuntu-dc.conf. Elle filtre sur le nom d'hote source, hostname egal a ubuntu-dc, et route les logs recus vers deux destinations en parallele, sans stopper le traitement standard : /var/log/syslog pour une vue centralisee avec les logs locaux d'Ubuntu-01, et /var/log/remote/ubuntu-dc.log pour une vue filtree, specifique a cette source, dans un dossier dedie avec des permissions restreintes (groupe syslog:adm, mode 750).
+Une règle rsyslog dédiée est ajoutée dans /etc/rsyslog.d/10-remote-ubuntu-dc.conf. Elle filtre sur le nom d'hôte source, hostname égal à ubuntu-dc, et route les logs reçus vers deux destinations en parallèle, sans stopper le traitement standard : /var/log/syslog pour une vue centralisée avec les logs locaux d'Ubuntu-01, et /var/log/remote/ubuntu-dc.log pour une vue filtrée, spécifique à cette source, dans un dossier dédié avec des permissions restreintes (groupe syslog:adm, mode 750).
 
-Au moment de la mise en place, le pare-feu UFW s'est avere inactif sur Ubuntu-01 (serveur cree mais jamais durci) ; point releve pour une session ulterieure de durcissement.
+Au moment de la mise en place, le pare-feu UFW s'est avéré inactif sur Ubuntu-01 (serveur créé mais jamais durci) ; point relevé pour une session ultérieure de durcissement.
 
-## Mise en place cote emission (Ubuntu-DC)
+## Mise en place côté émission (Ubuntu-DC)
 
-Une regle de forward est ajoutee sur Ubuntu-DC, envoyant tous les messages vers 192.168.10.20 port 514, pour router l'ensemble de ses logs vers Ubuntu-01 en UDP. Un test de bout en bout avec la commande logger confirme que les messages generes sur Ubuntu-DC arrivent bien sur Ubuntu-01, dans les deux fichiers de destination attendus.
+Une règle de forward est ajoutée sur Ubuntu-DC, envoyant tous les messages vers 192.168.10.20 port 514, pour router l'ensemble de ses logs vers Ubuntu-01 en UDP. Un test de bout en bout avec la commande logger confirme que les messages générés sur Ubuntu-DC arrivent bien sur Ubuntu-01, dans les deux fichiers de destination attendus.
 
-## Retention et rotation
+## Rétention et rotation
 
-La retention des logs est geree via logrotate, avec une configuration dediee dans /etc/logrotate.d/remote-ubuntu-dc : rotation quotidienne, conservation de 7 jours, compression differee (pour ne pas comprimer le fichier du jour en cours). La configuration est testee en mode simulation avec logrotate -d avant d'etre validee en conditions reelles, afin de ne pas saturer le disque avec un historique illimite.
+La rétention des logs est gérée via logrotate, avec une configuration dédiée dans /etc/logrotate.d/remote-ubuntu-dc : rotation quotidienne, conservation de 7 jours, compression différée (pour ne pas comprimer le fichier du jour en cours). La configuration est testée en mode simulation avec logrotate -d avant d'être validée en conditions réelles, afin de ne pas saturer le disque avec un historique illimité.
 
-## Ce que ca m'a appris
+## Ce que ça m'a appris
 
-Separer la vue centralisee (syslog global) et la vue filtree par source (fichier dedie par machine emettrice) permet de garder a la fois une vision d'ensemble et la capacite a isoler rapidement les logs d'un hote precis, ce qui est directement transposable a un contexte SOC reel. Tester une politique de retention en mode simulation (logrotate -d) avant de la valider evite de decouvrir un probleme de configuration au moment ou les logs sont deja perdus. Decouvrir un pare-feu inactif sur un serveur fraichement cree est un rappel qu'un service par defaut n'est pas forcement durci, et qu'il faut verifier explicitement chaque machine ajoutee au labo plutot que de supposer une configuration coherente avec les autres.
+Séparer la vue centralisée (syslog global) et la vue filtrée par source (fichier dédié par machine émettrice) permet de garder à la fois une vision d'ensemble et la capacité à isoler rapidement les logs d'un hôte précis, ce qui est directement transposable à un contexte SOC réel. Tester une politique de rétention en mode simulation (logrotate -d) avant de la valider évite de découvrir un problème de configuration au moment où les logs sont déjà perdus. Découvrir un pare-feu inactif sur un serveur fraîchement créé est un rappel qu'un service par défaut n'est pas forcément durci, et qu'il faut vérifier explicitement chaque machine ajoutée au labo plutôt que de supposer une configuration cohérente avec les autres.
