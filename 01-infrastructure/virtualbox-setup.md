@@ -6,7 +6,7 @@ CYBER-LAB est un labo personnel monté sous VirtualBox, conçu comme une « entr
 
 ## Prérequis matériel
 
-Virtualisation Intel VMX réactivée au BIOS. VirtualBox 7.2.20 installé, avec les VMs réparties entre deux disques selon l'espace disponible (disques E: puis D: au fur et à mesure de l'ajout de nouvelles machines). Le PC hôte dispose de 32 Go de RAM au total, ce qui permet de faire tourner plusieurs VMs en parallèle.
+Virtualisation Intel VMX réactivée au BIOS. VirtualBox 7.2.20 installé. Le PC hôte dispose de 32 Go de RAM au total, ce qui permet de faire tourner plusieurs VMs en parallèle.
 
 ## Machines du labo
 
