@@ -75,7 +75,7 @@ Depuis une session SSH déjà connectée par clé :
 sudo nano /etc/ssh/sshd_config
 ```
 
-Mettre (ou ajouter) :
+Modifier (ou ajouter) :
 ```
 PasswordAuthentication no
 PubkeyAuthentication yes
