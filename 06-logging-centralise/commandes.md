@@ -118,3 +118,62 @@ Active le pare-feu avec la politique par défaut (deny en entrée, allow en sort
 sudo ufw status verbose
 ```
 Vérifie l'état et le détail des règles actives, puis revalidation de la connexion SSH et de la réception des logs pour confirmer qu'aucun flux légitime n'a été cassé.
+
+## Ajout d'une deuxième source : Ubuntu-Client
+
+```bash
+sudo nano /etc/rsyslog.d/90-forward-ubuntu01.conf
+```
+Crée la règle de forward sur Ubuntu-Client (même principe que sur Ubuntu-DC).
+
+```
+*.* @192.168.10.20:514
+```
+Envoie l'ensemble des messages de log générés sur Ubuntu-Client vers Ubuntu-01, port 514, en UDP.
+
+```bash
+sudo nano /etc/rsyslog.d/11-remote-ubuntu-client.conf
+```
+Crée la règle dédiée sur Ubuntu-01 pour filtrer et router les logs provenant spécifiquement d'Ubuntu-Client.
+
+```
+if $fromhost-ip == '192.168.10.30' then
+{
+    action(type="omfile" file="/var/log/remote/ubuntu-client.log")
+}
+```
+Filtre les messages selon l'adresse IP source (plutôt que le hostname contenu dans le message, moins fiable) et les écrit en plus dans un fichier dédié, sans bloc d'arrêt du traitement.
+
+```bash
+sudo systemctl restart rsyslog
+```
+Redémarre rsyslog sur Ubuntu-Client ET sur Ubuntu-01 pour appliquer les deux nouvelles configurations — une étape à ne pas oublier, la configuration seule ne suffit pas tant que le service n'a pas rechargé.
+
+```bash
+logger "Test de forward depuis Ubuntu-Client"
+```
+Génère un message de test, à vérifier ensuite côté Ubuntu-01 dans /var/log/syslog et dans /var/log/remote/ubuntu-client.log.
+
+```bash
+sudo nano /etc/logrotate.d/remote-ubuntu-client
+```
+Crée la configuration de rotation dédiée aux logs distants d'Ubuntu-Client.
+
+```
+/var/log/remote/ubuntu-client.log {
+    daily
+    rotate 7
+    delaycompress
+    missingok
+    notifempty
+    postrotate
+        /usr/lib/rsyslog/rsyslog-rotate
+    endscript
+}
+```
+Rotation quotidienne, conservation de 7 jours. Le bloc postrotate est indispensable : sans lui, rsyslog n'est jamais informé de rouvrir ses fichiers après une rotation, et continue d'écrire dans l'ancien fichier renommé en .1 au lieu de basculer vers un nouveau fichier vide.
+
+```bash
+sudo logrotate -f /etc/logrotate.d/remote-ubuntu-client
+```
+Force une rotation réelle. À vérifier ensuite avec ls -l /var/log/remote/ : un nouveau fichier ubuntu-client.log (vide) doit apparaître à côté de ubuntu-client.log.1.
