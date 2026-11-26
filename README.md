@@ -4,7 +4,7 @@ Journal de bord technique de mon labo de cybersécurité/réseau (CYBER-LAB) et 
 
 ## Objectif
 
-Documenter, au fil de l'eau, les choix d'architecture, les manipulations techniques, les pannes rencontrées et leur résolution, pour garder une trace exploitable de ce que j'apprends et pour présenter un parcours concret et vérifiable à de futurs employeurs ou formateurs. Chaque dossier contient un ou plusieurs documents au format : contexte, mise en place, problèmes rencontrés, résolution, ce que ça m'a appris.
+Documenter, au fil et à mesure, les choix d'architecture, les manipulations techniques, les pannes rencontrées et leur résolution, pour garder une trace exploitable de ce que j'apprends et pour présenter un parcours concret et vérifiable à de futurs employeurs ou formateurs. Chaque dossier contient un ou plusieurs documents au format : contexte, mise en place, problèmes rencontrés, résolution, ce que ça m'a appris.
 
 ## Stack et environnement du labo
 
