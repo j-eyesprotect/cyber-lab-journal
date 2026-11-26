@@ -63,3 +63,27 @@ La passphrase n'est alors demandée qu'une seule fois par session Windows (`ssh-
 
   Le PC hôte Windows n'a pas accès au réseau interne VirtualBox (CYBER-LAB) : un réseau interne VirtualBox est isolé du PC hôte par définition, seules les VM qui y sont attachées peuvent se parler. La connexion SSH depuis le PC hôte passe donc par la seconde interface réseau de la VM, de type « Réseau privé hôte » (Host-only), et non par l'IP du réseau interne CYBER-LAB.
   
+
+
+## 6. Désactiver l'authentification par mot de passe (côté serveur)
+
+Une fois la connexion par clé validée, on désactive le mot de passe pour ne garder que l'authentification par clé — à faire sur chaque VM (ici Ubuntu-01), comme déjà fait sur Ubuntu-DC.
+
+Depuis une session SSH déjà connectée par clé :
+
+```
+sudo nano /etc/ssh/sshd_config
+```
+
+Mettre (ou ajouter) :
+```
+PasswordAuthentication no
+PubkeyAuthentication yes
+```
+
+Sauvegarder (`Ctrl+O`, Entrée, `Ctrl+X`), puis recharger le service :
+```
+sudo systemctl restart ssh
+```
+
+**Important avant de fermer la session en cours** : ouvrir un **nouveau** terminal et tester `ssh ubuntu-01` pour confirmer que la connexion par clé fonctionne toujours, avant de fermer la session déjà ouverte — pour garder un accès de secours si jamais le redemarrage du service casse quelque chose.
