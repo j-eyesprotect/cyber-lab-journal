@@ -1,0 +1,54 @@
+# Git : installation et fonctionnement
+
+Nov 27, 2026
+
+## Qu'est-ce que Git
+
+Git est un système de gestion de versions : il garde l'historique de ton code, te permet de revenir en arrière, de travailler sur des branches séparées, et de collaborer sans écraser le travail des autres.
+
+Ce n'est **pas** la même chose que GitHub : Git est l'outil (installé en local sur ta machine), GitHub est un service en ligne qui héberge des dépôts Git et ajoute des fonctionnalités collaboratives (pull requests, issues, etc.). Tu peux utiliser Git en local sans jamais toucher à GitHub, mais GitHub (comme GitLab, Bitbucket...) s'appuie sur Git en dessous.
+
+**Lien de téléchargement officiel :** https://git-scm.com/downloads
+
+## Le cycle de travail
+
+Git prend des "photos" (snapshots) de ton projet à chaque fois que tu fais un commit. Tu peux revenir à n'importe quel snapshot, comparer les versions, ou créer des branches pour tester des choses sans casser ta version stable.
+
+Les trois zones :
+
+1. **Working directory** : tes fichiers tels que tu les modifies sur ton disque.
+2. **Staging area (index)** : tu choisis avec `git add` quels changements seront inclus dans le prochain commit (tu peux ajouter seulement certains fichiers, ou même certaines lignes).
+3. **Dépôt local (repository)** : `git commit` fige un snapshot permanent dans l'historique, avec un message décrivant le changement. Tout ça reste sur ta machine, sans connexion internet.
+
+Le dépôt distant (GitHub, GitLab, ou ton propre serveur) n'entre en jeu que si tu fais `git push` — c'est optionnel et indépendant du fonctionnement de Git lui-même.
+
+## Les commandes essentielles pour démarrer
+
+- `git init` — transforme un dossier en dépôt Git
+- `git clone <url>` — récupère un dépôt existant (typiquement depuis GitHub)
+- `git status` — montre l'état actuel (fichiers modifiés, en staging, etc.)
+- `git add <fichier>` (ou `git add .` pour tout) — prépare les changements
+- `git commit -m "message"` — enregistre un snapshot
+- `git log` — historique des commits
+- `git diff` — montre les différences précises
+- `git branch` / `git checkout -b <nom>` — créer et changer de branche (pour tester des choses isolément)
+- `git merge` — fusionner une branche dans une autre
+
+## Lien avec OverTheWire Bandit
+
+Ce qui a été vu dans Bandit, c'était probablement surtout du terminal/Linux classique. Git n'a pas de lien direct avec Bandit, mais il y a parfois des niveaux ou des wargames dédiés qui touchent à l'inspection de dépôts Git (par exemple retrouver des infos planquées dans l'historique des commits) — comprendre Git maintenant sert aussi pour ce genre d'exercices.
+
+## Après l'installation
+
+Pour vérifier que Git est bien installé :
+
+```
+git --version
+```
+
+Puis configurer son identité avant le premier commit :
+
+```
+git config --global user.name "ton nom"
+git config --global user.email "ton email"
+```
